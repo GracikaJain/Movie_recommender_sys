@@ -91,7 +91,7 @@ def is_valid_pickle(file_path):
         with open(file_path, 'rb') as f:
             pickle.load(f)
         return True
-    except Exception as e:
+    except Exception:
         return False
 
 def recommend(movie):
