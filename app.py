@@ -117,7 +117,7 @@ def main():
     movies_path = os.path.join(current_dir, 'movies.pkl')
     similarity_path = os.path.join(current_dir, 'similarity.pkl')
 
-    # Hardcoded Google Drive file ID for similarity.pkl
+    # Extract the Google Drive file ID from the sharable link
     file_id = "1YqdujPMdCO_KF1um10B16_ZtOyC0icJ1"
 
     # If similarity.pkl is not present, download it
