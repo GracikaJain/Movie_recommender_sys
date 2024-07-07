@@ -66,16 +66,22 @@ if st.button('Recommend'):
     for i in rec:
         st.write(i)
 '''
-
 import streamlit as st
 import pickle
 import os
-import urllib.request
+import requests
 
 def download_file(url, output_path):
     try:
-        urllib.request.urlretrieve(url, output_path)
-        st.success(f"Downloaded {os.path.basename(output_path)} successfully.")
+        response = requests.get(url, stream=True)
+        if response.status_code == 200:
+            with open(output_path, 'wb') as f:
+                for chunk in response.iter_content(chunk_size=8192):
+                    f.write(chunk)
+            st.success(f"Downloaded {os.path.basename(output_path)} successfully.")
+        else:
+            st.error(f"Failed to download file: {response.status_code}")
+            st.stop()
     except Exception as e:
         st.error(f"An error occurred while downloading the file: {e}")
         st.stop()
