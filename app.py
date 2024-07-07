@@ -86,10 +86,12 @@ def extract_download_link(readme_path, file_name):
         with open(readme_path, 'r') as file:
             readme_content = file.read()
         # Regex to find Google Drive link
-        url_pattern = re.compile(r'https://drive\.google\.com/\S+')
+        url_pattern = re.compile(r'https://drive\.google\.com/file/d/([a-zA-Z0-9_-]+)/view')
         match = url_pattern.search(readme_content)
         if match:
-            return match.group(0)
+            file_id = match.group(1)
+            direct_link = f"https://drive.google.com/uc?export=download&id={file_id}"
+            return direct_link
         else:
             st.error(f"No download link found for {file_name} in the README.")
             st.stop()
