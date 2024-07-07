@@ -69,27 +69,29 @@ if st.button('Recommend'):
 import streamlit as st
 import pickle
 import os
-import requests
+from google.oauth2 import service_account
+from googleapiclient.discovery import build
+
+# Replace with your credentials JSON file path
+SERVICE_ACCOUNT_FILE = 'path/to/your/credentials.json'
+SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 def download_file_from_google_drive(file_id, destination):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
     try:
-        session = requests.Session()
-        response = session.get(url, stream=True)
-        token = None
+        creds = service_account.Credentials.from_service_account_file(
+            SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
-        if "uc" in response.url:
-            token = response.url.split("=")[-1]
+        drive_service = build('drive', 'v3', credentials=creds)
 
-        if token:
-            url = f"https://drive.google.com/uc?export=download&id={file_id}&confirm={token}"
-            response = session.get(url, stream=True)
+        request = drive_service.files().export_media(fileId=file_id,
+                                                     mimeType='application/octet-stream')
 
-        with open(destination, 'wb') as f:
-            for chunk in response.iter_content(chunk_size=32768):
-                if chunk:
-                    f.write(chunk)
-        
+        fh = open(destination, 'wb')
+        downloader = MediaIoBaseDownload(fh, request)
+        done = False
+        while done is False:
+            status, done = downloader.next_chunk()
+
         st.success(f"Downloaded {os.path.basename(destination)} successfully.")
     except Exception as e:
         st.error(f"An error occurred while downloading the file: {e}")
