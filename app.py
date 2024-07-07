@@ -73,7 +73,7 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 
 # Replace with your credentials JSON file path
-SERVICE_ACCOUNT_FILE = 'path/to/your/credentials.json'
+SERVICE_ACCOUNT_FILE = 'radiant-saga-335602-516fdd5fffbf.json'
 SCOPES = ['https://www.googleapis.com/auth/drive.readonly']
 
 def download_file_from_google_drive(file_id, destination):
