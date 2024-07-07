@@ -71,14 +71,16 @@ import pickle
 import os
 import requests
 
-def download_file(url, output_path):
+def download_file_from_google_drive(file_id, destination):
+    url = f"https://drive.google.com/uc?export=download&id={file_id}"
     try:
         response = requests.get(url, stream=True)
         if response.status_code == 200:
-            with open(output_path, 'wb') as f:
+            with open(destination, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
-            st.success(f"Downloaded {os.path.basename(output_path)} successfully.")
+                    if chunk:  # filter out keep-alive new chunks
+                        f.write(chunk)
+            st.success(f"Downloaded {os.path.basename(destination)} successfully.")
         else:
             st.error(f"Failed to download file: {response.status_code}")
             st.stop()
@@ -115,12 +117,12 @@ def main():
     movies_path = os.path.join(current_dir, 'movies.pkl')
     similarity_path = os.path.join(current_dir, 'similarity.pkl')
 
-    # Hardcoded download link for similarity.pkl
-    download_link = "https://drive.google.com/uc?export=download&id=1YqdujPMdCO_KF1um10B16_ZtOyC0icJ1"
+    # Hardcoded Google Drive file ID for similarity.pkl
+    file_id = "1YqdujPMdCO_KF1um10B16_ZtOyC0icJ1"
 
     # If similarity.pkl is not present, download it
     if not os.path.isfile(similarity_path):
-        download_file(download_link, similarity_path)
+        download_file_from_google_drive(file_id, similarity_path)
 
     # Validate the downloaded similarity.pkl file
     if not is_valid_pickle(similarity_path):
