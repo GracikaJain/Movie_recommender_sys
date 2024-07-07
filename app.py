@@ -71,14 +71,28 @@ import pickle
 import os
 import requests
 
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+    return None
+
 def download_file_from_google_drive(file_id, destination):
-    url = f"https://drive.google.com/uc?export=download&id={file_id}"
+    url = "https://drive.google.com/uc?export=download"
+    session = requests.Session()
+
+    response = session.get(url, params={'id': file_id}, stream=True)
+    token = get_confirm_token(response)
+
+    if token:
+        params = {'id': file_id, 'confirm': token}
+        response = session.get(url, params=params, stream=True)
+
     try:
-        response = requests.get(url, stream=True)
         if response.status_code == 200:
             with open(destination, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:  # filter out keep-alive new chunks
+                for chunk in response.iter_content(chunk_size=32768):
+                    if chunk:
                         f.write(chunk)
             st.success(f"Downloaded {os.path.basename(destination)} successfully.")
         else:
