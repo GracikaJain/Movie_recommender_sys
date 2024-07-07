@@ -71,7 +71,6 @@ import streamlit as st
 import pickle
 import os
 import urllib.request
-import re
 
 def download_file(url, output_path):
     try:
@@ -79,24 +78,6 @@ def download_file(url, output_path):
         st.success(f"Downloaded {os.path.basename(output_path)} successfully.")
     except Exception as e:
         st.error(f"An error occurred while downloading the file: {e}")
-        st.stop()
-
-def extract_download_link(readme_path, file_name):
-    try:
-        with open(readme_path, 'r') as file:
-            readme_content = file.read()
-        # Regex to find Google Drive link
-        url_pattern = re.compile(r'https://drive\.google\.com/file/d/([a-zA-Z0-9_-]+)/view')
-        match = url_pattern.search(readme_content)
-        if match:
-            file_id = match.group(1)
-            direct_link = f"https://drive.google.com/uc?export=download&id={file_id}"
-            return direct_link
-        else:
-            st.error(f"No download link found for {file_name} in the README.")
-            st.stop()
-    except Exception as e:
-        st.error(f"An error occurred while reading the README file: {e}")
         st.stop()
 
 def recommend(movie):
@@ -117,12 +98,11 @@ def main():
 
     # Ensure the files are in the same directory as this script
     current_dir = os.path.dirname(__file__)
-    readme_path = os.path.join(current_dir, 'README.md')
     movies_path = os.path.join(current_dir, 'movies.pkl')
     similarity_path = os.path.join(current_dir, 'similarity.pkl')
 
-    # Extract the download link from the README file
-    download_link = extract_download_link(readme_path, 'similarity.pkl')
+    # Hardcoded download link for similarity.pkl
+    download_link = "https://drive.google.com/uc?export=download&id=1YqdujPMdCO_KF1um10B16_ZtOyC0icJ1"
 
     # If similarity.pkl is not present, download it
     if not os.path.isfile(similarity_path):
