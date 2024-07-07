@@ -80,6 +80,14 @@ def download_file(url, output_path):
         st.error(f"An error occurred while downloading the file: {e}")
         st.stop()
 
+def is_valid_pickle(file_path):
+    try:
+        with open(file_path, 'rb') as f:
+            pickle.load(f)
+        return True
+    except Exception as e:
+        return False
+
 def recommend(movie):
     movie_index = movies_df[movies_df['title'] == movie].index[0]
     distances = similarity[movie_index]
@@ -107,6 +115,11 @@ def main():
     # If similarity.pkl is not present, download it
     if not os.path.isfile(similarity_path):
         download_file(download_link, similarity_path)
+
+    # Validate the downloaded similarity.pkl file
+    if not is_valid_pickle(similarity_path):
+        st.error(f"Downloaded file is not a valid pickle file: {similarity_path}")
+        st.stop()
 
     # Load movies.pkl and similarity.pkl
     try:
